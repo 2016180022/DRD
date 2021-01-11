@@ -9,10 +9,7 @@ CANVAS_WIDTH = 720
 CANVAS_HEIGHT = 480
 
 def enter():
-	global sd
 	gfw.world.init(['bg', 'sd', 'mob'])
-	sd = SD()
-	gfw.world.add(gfw.layer.sd, sd)
 
 	bg = gobj.ImageObject('demotile_town.png', CANVAS_WIDTH // 2, CANVAS_HEIGHT // 2, CANVAS_WIDTH, CANVAS_HEIGHT)
 	gfw.world.add(gfw.layer.bg, bg)
@@ -24,18 +21,28 @@ def draw():
 	gfw.world.draw()
 
 def handle_event(e):
-	global sd
 	if e.type == SDL_QUIT:
 		gfw.quit()
 	elif e.type == SDL_KEYDOWN:
 		if e.key == SDLK_ESCAPE:
 			gfw.pop()
+		elif e.key == SDLK_c:
+			set_sd()
+			print("set mod")
 
-	sd.handle_event(e)
-
+	if gfw.world.count_at(gfw.layer.sd) > 0:
+		sd.handle_event(e)
+	else:
+		return
 
 def exit():
 	pass
+
+def set_sd():
+	global sd
+	sd = SD()
+	gfw.world.add(gfw.layer.sd, sd)
+	print("set sd")
 
 if __name__ == '__main__':
 	gfw.run_main()

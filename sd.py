@@ -3,6 +3,44 @@ from pico2d import *
 import gfw
 import gobj
 
+class SettingState:
+	@staticmethod
+	def get(sd):
+		if not hasattr(SettingState, 'singlton'):
+			SettingState.singlton = SettingState()
+			SettingState.singlton.sd = sd
+		return SettingState.singlton
+
+	def __init__(self):
+		pass
+
+	def enter(self):
+		self.pos = (0, 0)
+		self.sd.action = 'Set'
+		print("now Set")
+		hide_cursor()
+
+	def exit(self):
+		show_cursor()
+
+	def draw(self):
+		job_images = self.sd.images[self.sd.char]
+		images = job_images['Wait']
+		image = images[0]
+		flip = 'h'
+		image.composite_draw(0, flip, *self.pos, 1.5 * image.w, 1.5 * image.h)
+
+	def update(self):
+		pass
+
+	def handle_event(self, e):
+		if e.type == SDL_MOUSEMOTION:
+			pos_x, pos_y = e.x, get_canvas_height() - e.y - 1
+			self.pos = pos_x + 100, pos_y + 100
+		elif e.type == SDL_MOUSEBUTTONDOWN:
+			self.sd.pos = self.pos
+			self.sd.set_state(WaitingState)
+
 class WaitingState:
 	@staticmethod
 	def get(sd):
@@ -17,6 +55,8 @@ class WaitingState:
 	def enter(self):
 		self.time = 0
 		self.frame = 0
+		print("now Wait")
+		self.sd.action = "Wait"
 
 	def exit(self):
 		pass
@@ -36,24 +76,69 @@ class WaitingState:
 		self.frame = int(frame) % frame_number
 
 	def handle_event(self, e):
+		if e.type == SDL_KEYDOWN:
+			if e.key == SDLK_SPACE:
+				self.sd.set_state(AttackingState)
+				self.sd.action = 'Attack'
+
+class AttackingState:
+	@staticmethod
+	def get(sd):
+		if not hasattr(AttackingState, 'singlton'):
+			AttackingState.singlton = AttackingState()
+			AttackingState.singlton.sd = sd
+		return AttackingState.singlton
+
+	def __init__(self):
+		pass
+
+	def enter(self):
+		self.time = 0
+		self.frame = 0
+		print("now Attack")
+		
+	def exit(self):
+		pass
+
+	def draw(self):
+		job_images = self.sd.images[self.sd.char]
+		#image = images[self.sd.fidx % len(images)]
+		images = job_images[self.sd.action]
+		image = images[self.frame]
+		pos_x, pos_y = self.sd.pos
+		pos_x -= 150
+		image.draw(pos_x, pos_y, 1.5 * image.w, 1.5 * image.h)
+		#image.draw(50, 500, 1.5 * image.w, 1.5 * image.h)
+
+	def update(self):
+		self.time += gfw.delta_time
+		frame = self.time * 8
+		#frame_number = 12
+		if self.frame < 12:
+			self.frame = int(frame)
+		else:
+			self.sd.set_state(WaitingState)
+
+	def handle_event(self, e):
 		pass
 
 class SD:
 	FPS = 12
-	ACTIONS = ['Wait']
+	ACTIONS = ['Set','Wait', 'Attack']
 	images = {}
 	def __init__(self):
 		SD.load_all_images()
 		self.char = 'darktemplar'
-		self.action = 'Wait'
+		self.action = 'Set'
 		self.fidx = 0
 		self.reset()
 
 	def reset(self):
 		self.pos = (200, 500)
 		self.time = 0
+		self.range = 100
 		self.state = None
-		self.set_state(WaitingState)
+		self.set_state(SettingState)
 
 	def set_state(self, cls):
 		if self.state != None:
@@ -101,4 +186,3 @@ class SD:
 		SD.images[char] = images
 		print('%d images loaded for %s' %(count, char))
 		return images
-
