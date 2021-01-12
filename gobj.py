@@ -31,6 +31,18 @@ def draw_collision_box():
 		if hasattr(obj, 'get_bb'):
 			draw_rectangle(*obj.get_bb())
 
+def set_flip_pos(pos_x, pos_y):
+	x, y = pos_x, pos_y
+	x += 62
+	#y -= 67
+	return x, y
+
+def set_pos_origin(pos_x, pos_y):
+	x, y = pos_x, pos_y
+	x -= 62
+	y += 67
+	return x, y
+
 class ImageObject:
 	def __init__(self, imageName, x, y, x2, y2):
 		self.image = gfw.image.load(RES_DIR + imageName)

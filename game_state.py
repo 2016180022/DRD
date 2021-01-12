@@ -4,14 +4,15 @@ import gfw
 import gobj
 from pico2d import *
 from sd import SD
+from mob import Mob
 
-CANVAS_WIDTH = 720
-CANVAS_HEIGHT = 480
+canvas_width = 720
+canvas_height = 480
 
 def enter():
 	gfw.world.init(['bg', 'sd', 'mob'])
 
-	bg = gobj.ImageObject('demotile_town.png', CANVAS_WIDTH // 2, CANVAS_HEIGHT // 2, CANVAS_WIDTH, CANVAS_HEIGHT)
+	bg = gobj.ImageObject('demotile_town.png', canvas_width // 2, canvas_height // 2, canvas_width, canvas_height)
 	gfw.world.add(gfw.layer.bg, bg)
 
 def update():
@@ -28,7 +29,9 @@ def handle_event(e):
 			gfw.pop()
 		elif e.key == SDLK_c:
 			set_sd()
-			print("set mod")
+		elif e.key == SDLK_v:
+			set_mob()
+
 
 	if gfw.world.count_at(gfw.layer.sd) > 0:
 		sd.handle_event(e)
@@ -43,6 +46,12 @@ def set_sd():
 	sd = SD()
 	gfw.world.add(gfw.layer.sd, sd)
 	print("set sd")
+
+def set_mob():
+	global mob
+	mob = Mob()
+	gfw.world.add(gfw.layer.mob, mob)
+	print("set mob")
 
 if __name__ == '__main__':
 	gfw.run_main()
