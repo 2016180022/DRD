@@ -6,9 +6,9 @@ import gobj
 class SettingState:
 	@staticmethod
 	def get(sd):
-		if not hasattr(SettingState, 'singlton'):
-			SettingState.singlton = SettingState()
-			SettingState.singlton.sd = sd
+		#if not hasattr(SettingState, 'singlton'):
+		SettingState.singlton = SettingState()
+		SettingState.singlton.sd = sd
 		return SettingState.singlton
 
 	def __init__(self):
@@ -44,9 +44,9 @@ class SettingState:
 class WaitingState:
 	@staticmethod
 	def get(sd):
-		if not hasattr(WaitingState, 'singlton'):
-			WaitingState.singlton = WaitingState()
-			WaitingState.singlton.sd = sd
+		#if not hasattr(WaitingState, 'singlton'):
+		WaitingState.singlton = WaitingState()
+		WaitingState.singlton.sd = sd
 		return WaitingState.singlton
 
 	def __init__(self):
@@ -74,19 +74,19 @@ class WaitingState:
 		self.time += gfw.delta_time
 		frame = self.time * 8
 		self.frame = int(frame) % frame_number
+		self.sd.set_target()
 
 	def handle_event(self, e):
 		if e.type == SDL_KEYDOWN:
 			if e.key == SDLK_SPACE:
 				self.sd.set_state(AttackingState)
-				self.sd.action = 'Attack'
 
 class AttackingState:
 	@staticmethod
 	def get(sd):
-		if not hasattr(AttackingState, 'singlton'):
-			AttackingState.singlton = AttackingState()
-			AttackingState.singlton.sd = sd
+		#if not hasattr(AttackingState, 'singlton'):
+		AttackingState.singlton = AttackingState()
+		AttackingState.singlton.sd = sd
 		return AttackingState.singlton
 
 	def __init__(self):
@@ -95,6 +95,7 @@ class AttackingState:
 	def enter(self):
 		self.time = 0
 		self.frame = 0
+		self.sd.action = 'Attack'
 		print("now Attack")
 		
 	def exit(self):
@@ -130,19 +131,22 @@ class SD:
 		SD.load_all_images()
 		self.char = 'darktemplar'
 		self.action = 'Set'
-		self.fidx = 0
+		self.layer = list(gfw.world.objects_at(gfw.layer.mob))
 		self.reset()
 
 	def reset(self):
 		self.pos = (200, 500)
 		self.time = 0
-		self.range = 100
+		self.fidx = 0
+		self.target_index = 0
+		self.range = 250
+		self.ndsq = 100000
 		self.state = None
 		self.set_state(SettingState)
 
 	def set_state(self, cls):
-		if self.state != None:
-			self.state.exit()
+		#if self.state != None:
+			#self.state.exit()
 		self.state = cls.get(self)
 		self.state.enter()
 
@@ -158,6 +162,40 @@ class SD:
 
 	def remove(self):
 		gfw.world.remove(self)
+
+	def set_target(self):
+		if gfw.world.count_at(gfw.layer.mob) <= 0:
+			return
+		x, y = self.pos
+		nearest_distance = 100000
+		index = 0
+		nearest_index = 0
+		# for i in self.layer[index]:
+		# self.mob = self.layer[index]
+		# mx, my = self.mob.pos
+		# dsq = (x - mx)** 2 + (y - my)** 2
+		# if nearest_dsq > dsq:
+		# 	nearest_dsq = dsq
+		# 	nearest_index = index
+		# index += 1
+		for i in gfw.world.objects_at(gfw.layer.mob):
+			px, py = i.pos
+			dx, dy = px - x, py - y
+			distance = math.sqrt(dx**2 + dy**2)
+			if nearest_distance > distance:
+				nearest_distance = distance
+				nearest_index = index
+		index += 1
+		self.target_index = nearest_index
+		self.ndsq = nearest_distance
+		print(self.ndsq)
+		self.attack_target()
+
+	def attack_target(self):
+		if self.range > self.ndsq and self.action == 'Wait':
+			self.set_state(AttackingState)
+			return True
+
 
 	@staticmethod
 	def load_all_images():

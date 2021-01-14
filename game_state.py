@@ -5,6 +5,7 @@ import gobj
 from pico2d import *
 from sd import SD
 from mob import Mob
+import life_gauge
 
 canvas_width = 720
 canvas_height = 480
@@ -15,8 +16,12 @@ def enter():
 	bg = gobj.ImageObject('demotile_town.png', canvas_width // 2, canvas_height // 2, canvas_width, canvas_height)
 	gfw.world.add(gfw.layer.bg, bg)
 
+	life_gauge.load()
+
 def update():
 	gfw.world.update()
+	if gfw.world.count_at(gfw.layer.sd) > 0 and gfw.world.count_at(gfw.layer.mob) > 0:
+		attack_mob()
 
 def draw():
 	gfw.world.draw()
@@ -31,7 +36,8 @@ def handle_event(e):
 			set_sd()
 		elif e.key == SDLK_v:
 			set_mob()
-
+		elif e.key == SDLK_b:
+			mob.decrease_life(10)
 
 	if gfw.world.count_at(gfw.layer.sd) > 0:
 		sd.handle_event(e)
@@ -40,6 +46,10 @@ def handle_event(e):
 
 def exit():
 	pass
+
+def attack_mob():
+	if sd.attack_target():
+		mob.decrease_life(50)
 
 def set_sd():
 	global sd
