@@ -21,7 +21,7 @@ class SettingState:
 		hide_cursor()
 
 	def exit(self):
-		show_cursor()
+		pass
 
 	def draw(self):
 		job_images = self.sd.images[self.sd.char]
@@ -35,11 +35,18 @@ class SettingState:
 
 	def handle_event(self, e):
 		if e.type == SDL_MOUSEMOTION:
-			pos_x, pos_y = e.x, get_canvas_height() - e.y - 1
-			self.pos = pos_x + 100, pos_y + 100
+			px, py = gobj.set_mouse_pos(e.x, e.y)
+			x, y = gobj.set_flip_pos(px, py)
+			x -= x % 60 + 50
+			y -= y % 60 - 24
+			self.pos = x, y
 		elif e.type == SDL_MOUSEBUTTONDOWN:
 			self.sd.pos = self.pos
-			self.sd.set_state(WaitingState)
+			if self.sd.check_position():
+				self.sd.set_state(WaitingState)
+			else:
+				print('cannot place there')
+				pass
 
 class WaitingState:
 	@staticmethod
@@ -53,6 +60,7 @@ class WaitingState:
 		pass
 
 	def enter(self):
+		show_cursor()
 		self.time = 0
 		self.frame = 0
 		print("now Wait")
@@ -195,6 +203,18 @@ class SD:
 		if self.range > self.ndsq and self.action == 'Wait':
 			self.set_state(AttackingState)
 			return True
+
+	def check_position(self):
+		px, py = self.pos
+		x, y = gobj.set_mouse_pos(px, py)
+		print(x, ', ', y)
+		xdone, ydone = False, False
+		#if not collision()
+		if x > 340 and x < 780:
+			xdone = True
+		if y > 120 and y < 360:
+			ydone = True
+		return xdone and ydone
 
 
 	@staticmethod

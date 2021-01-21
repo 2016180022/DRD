@@ -6,6 +6,7 @@ from pico2d import *
 from sd import SD
 from mob import Mob
 import life_gauge
+import mob_generator as mg
 
 canvas_width = 720
 canvas_height = 480
@@ -17,9 +18,12 @@ def enter():
 	gfw.world.add(gfw.layer.bg, bg)
 
 	life_gauge.load()
+	mg.init()
 
 def update():
 	gfw.world.update()
+	if mg.generate_mob():
+		mg.generate_mob()
 	if gfw.world.count_at(gfw.layer.sd) > 0 and gfw.world.count_at(gfw.layer.mob) > 0:
 		attack_mob()
 

@@ -31,6 +31,11 @@ def draw_collision_box():
 		if hasattr(obj, 'get_bb'):
 			draw_rectangle(*obj.get_bb())
 
+def set_mouse_pos(pos_x, pos_y):
+	px, py = pos_x, get_canvas_height() - pos_y - 1
+	x, y = px + 100, py + 100
+	return x, y
+
 def set_flip_pos(pos_x, pos_y):
 	x, y = pos_x, pos_y
 	x += 62
@@ -41,6 +46,12 @@ def set_pos_origin(pos_x, pos_y):
 	x, y = pos_x, pos_y
 	x -= 62
 	y += 67
+	return x, y
+
+def set_sd_pevot(pos_x, pos_y):
+	x, y = pos_x, pos_y
+	x -= x % 60
+	y -= y % 60
 	return x, y
 
 class ImageObject:
