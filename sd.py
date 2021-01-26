@@ -216,6 +216,15 @@ class SD:
 			ydone = True
 		return xdone and ydone
 
+	def get_bb(self):
+		width = 25
+		height = 30
+		y_move = 110
+		x_move = 100
+		x, y = self.pos
+		y -= y_move
+		x -= x_move
+		return x - width, y - height, x + width, y + height
 
 	@staticmethod
 	def load_all_images():

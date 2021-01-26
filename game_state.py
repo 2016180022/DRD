@@ -22,13 +22,14 @@ def enter():
 
 def update():
 	gfw.world.update()
-	if mg.generate_mob():
-		mg.generate_mob()
-	if gfw.world.count_at(gfw.layer.sd) > 0 and gfw.world.count_at(gfw.layer.mob) > 0:
-		attack_mob()
+	# if mg.generate_mob():
+	# 	mg.generate_mob()
+	# if gfw.world.count_at(gfw.layer.sd) > 0 and gfw.world.count_at(gfw.layer.mob) > 0:
+	# 	attack_mob()
 
 def draw():
 	gfw.world.draw()
+	gobj.draw_collision_box()
 
 def handle_event(e):
 	if e.type == SDL_QUIT:
@@ -45,6 +46,10 @@ def handle_event(e):
 
 	if gfw.world.count_at(gfw.layer.sd) > 0:
 		sd.handle_event(e)
+		# for s in gfw.world.objects_at(gfw.layer.sd):
+		# 	if gobj.collides_box(sd, s):
+		# 		print('cannot place there', sd)
+		# 		return
 	else:
 		return
 
