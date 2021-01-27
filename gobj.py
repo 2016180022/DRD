@@ -31,10 +31,24 @@ def draw_collision_box():
 		if hasattr(obj, 'get_bb'):
 			draw_rectangle(*obj.get_bb())
 
-def set_mouse_pos(pos_x, pos_y):
+def set_mouse_pos(pos_x, pos_y, repos=None):
 	px, py = pos_x, get_canvas_height() - pos_y - 1
-	x, y = px + 100, py + 100
+	x, y = px, py
+	if repos == None:
+		x += 100
+		y += 100
 	return x, y
+
+def pt_in_rect(point, rect):
+	(x, y) = point
+	(l, b, r, t) = rect
+
+	if x < l : return False
+	if x > r: return False
+	if y < b: return False
+	if y > t: return False
+
+	return True
 
 def set_flip_pos(pos_x, pos_y):
 	x, y = pos_x, pos_y
