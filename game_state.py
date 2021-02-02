@@ -11,16 +11,42 @@ import mob_generator as mg
 canvas_width = 720
 canvas_height = 480
 
+stage = 'demo'
+
+STATE_PLAYING, STATE_PAUSED = range(2)
+
 def enter():
 	gfw.world.init(['bg', 'sd', 'mob'])
 
-	bg = gobj.ImageObject('demotile_town.png', canvas_width // 2, canvas_height // 2, canvas_width, canvas_height)
+	fn = 'tile_' + stage + '.png'
+	bg = gobj.ImageObject(fn, canvas_width // 2, canvas_height // 2, canvas_width, canvas_height)
 	gfw.world.add(gfw.layer.bg, bg)
 
 	life_gauge.load()
 	mg.init()
 
+	global game_state
+	game_state = STATE_PLAYING
+
+	global pause_image
+	pause_image = gfw.image.load(gobj.RES_DIR + 'pause_demo.png')
+
+def pause_game():
+	global game_state
+	game_state = STATE_PAUSED
+	print('paused game')
+
+def resume_game():
+	global game_state
+	game_state = STATE_PLAYING
+	print('resume game')
+
 def update():
+	global game_state
+
+	if game_state != STATE_PLAYING:
+		return
+
 	gfw.world.update()
 	# if mg.generate_mob():
 	# 	mg.generate_mob()
@@ -30,13 +56,23 @@ def update():
 def draw():
 	gfw.world.draw()
 	gobj.draw_collision_box()
+	if game_state == STATE_PAUSED:
+		x = get_canvas_width() // 2
+		y = get_canvas_height() // 2
+		pause_image.draw(x, y)
 
 def handle_event(e):
 	if e.type == SDL_QUIT:
-		gfw.quit()
+		return gfw.quit()
 	elif e.type == SDL_KEYDOWN:
 		if e.key == SDLK_ESCAPE:
-			gfw.pop()
+			if game_state != STATE_PAUSED:
+				pause_game()
+			else:
+				return gfw.pop()
+		elif e.key == SDLK_RETURN:
+			if game_state == STATE_PAUSED:
+				resume_game()
 		elif e.key == SDLK_c:
 			set_sd()
 		elif e.key == SDLK_v:
@@ -44,8 +80,11 @@ def handle_event(e):
 		elif e.key == SDLK_b:
 			mob.decrease_life(10)
 
-	if gfw.world.count_at(gfw.layer.sd) > 0:
-		sd.handle_event(e)
+	# if gfw.world.objects_at(gfw.layer.sd):
+	# 	sd.handle_event(e)
+	for obj in gfw.world.objects_at(gfw.layer.sd):
+		if obj.handle_event(e):
+			pass
 		# for s in gfw.world.objects_at(gfw.layer.sd):
 		# 	if gobj.collides_box(sd, s):
 		# 		print('cannot place there', sd)

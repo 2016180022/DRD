@@ -4,6 +4,8 @@ import gobj
 import gfw
 import life_gauge
 
+#생성자에 index 부여, 몹 생성기에서 index 넣어서 생성, 몹 클래스를 참조해서 sd에서 인덱스를 받아와서 공격하고, game_state에서 처리
+
 class Mob:
 	PAT_POSITIONS = [
 		gobj.set_pos_origin(110, 70),

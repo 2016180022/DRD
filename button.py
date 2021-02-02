@@ -11,6 +11,8 @@ class Button:
 		self.x, self.y, self.w, self.h = x, y, w, h
 		self.callback = callback
 		self.mpos = (0, 0)
+		self.capture = False
+		self.mouse_point = None
 		
 	def update(self):
 		pass
@@ -21,24 +23,41 @@ class Button:
 	def handle_event(self, e):
 		pair = (e.type, e.button)
 		x, y = e.x, e.y
-		#if self.mouse_point is None:
-		if pair == LBTN_DOWN:
-			if gobj.pt_in_rect(gobj.set_mouse_pos(x, y, 1), self.get_bb()):
-				return True
+		if self.mouse_point is None:
+			if pair == LBTN_DOWN:
+				if gobj.pt_in_rect(gobj.set_mouse_pos(x, y, 1), self.get_bb()):
+					self.capture = True
+					self.mouse_point = gobj.set_mouse_pos(x, y, 1)
+					return True
 			if e.type == SDL_MOUSEMOTION:
-				self.mpos = set_mouse_pos(x, y, 1)
-				if gobj.pt_in_rect(mpos, self.get_bb()):
+				self.mpos = gobj.set_mouse_pos(x, y, 1)
+				if gobj.pt_in_rect(self.mpos, self.get_bb()):
+					self.capture = True
 					return True
 				else:
+					self.capture = False
 					return False
 			return False
 
 		if pair == LBTN_UP:
-			mpos = gobj.set_mouse_pos(x, y, 1)
+			self.capture = False
+			self.mouse_point = None
+			#mpos = gobj.set_mouse_pos(x, y, 1)
 			if gobj.pt_in_rect(gobj.set_mouse_pos(x, y, 1), self.get_bb()):
-				if gobj.pt_in_rect(self.mpos, self.get_bb()):
-					self.callback()
-					return False
+				self.callback()
+				return False
+
+		if e.type == SDL_MOUSEMOTION:
+			if gobj.pt_in_rect(gobj.set_mouse_pos(x, y, 1), self.get_bb()):
+				self.capture = True
+			else:
+				self.capture = False
 
 	def get_bb(self):
 		return self.x - self.w // 2, self.y - self.h // 2, self.x + self.w // 2, self.y + self.h // 2
+
+	def print_capture(self):
+		if self.capture == True:
+			print("capture")
+		else:
+			print("non-captured")
