@@ -176,14 +176,7 @@ class SD:
 		x, y = self.pos
 		nearest_distance = 100000
 		nearest_index = 0
-		# for i in self.layer[index]:
-		# self.mob = self.layer[index]
-		# mx, my = self.mob.pos
-		# dsq = (x - mx)** 2 + (y - my)** 2
-		# if nearest_dsq > dsq:
-		# 	nearest_dsq = dsq
-		# 	nearest_index = index
-		# index += 1
+
 		for i in gfw.world.objects_at(gfw.layer.mob):
 			px, py = i.pos
 			dx, dy = px - x, py - y
