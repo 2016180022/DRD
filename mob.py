@@ -16,8 +16,9 @@ class Mob:
 	ACTIONS = ['Walk', 'Dead']
 	images = {}
 	FPS = 12
-	def __init__(self):
+	def __init__(self, index):
 		self.pos = gobj.set_pos_origin(110, 375)
+		self.target_index = index
 		self.action = 'Walk'
 		self.max_hp = 100
 		self.hp = self.max_hp
@@ -107,11 +108,15 @@ class Mob:
 
 		return done
 
-	def decrease_life(self, amount):
-		self.hp -= amount
-		if self.hp <= 0:
-			self.dead()
-		return self.hp <= 0
+	def decrease_life(self, amount, index):
+		print("called dl func")
+		for obj in gfw.world.objects_at(gfw.layer.mob):
+			if obj.target_index == index:
+				self.hp -= amount
+				print("apply decrease")
+				if self.hp <= 0:
+					self.dead()
+				return self.hp <= 0
 
 	def dead(self):
 		self.action = 'Dead'

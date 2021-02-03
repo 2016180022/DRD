@@ -146,7 +146,6 @@ class SD:
 		self.pos = (200, 500)
 		self.time = 0
 		self.fidx = 0
-		self.target_index = 0
 		self.range = 250
 		self.ndsq = 100000
 		self.state = None
@@ -176,7 +175,6 @@ class SD:
 			return
 		x, y = self.pos
 		nearest_distance = 100000
-		index = 0
 		nearest_index = 0
 		# for i in self.layer[index]:
 		# self.mob = self.layer[index]
@@ -192,17 +190,16 @@ class SD:
 			distance = math.sqrt(dx**2 + dy**2)
 			if nearest_distance > distance:
 				nearest_distance = distance
-				nearest_index = index
-		index += 1
-		self.target_index = nearest_index
+				nearest_index = i.target_index
 		self.ndsq = nearest_distance
 		print(self.ndsq)
-		self.attack_target()
+		self.attack_target(nearest_index)
 
-	def attack_target(self):
+	def attack_target(self, index):
 		if self.range > self.ndsq and self.action == 'Wait':
 			self.set_state(AttackingState)
-			return True
+			print("Attack target", index)
+			return index
 
 	def check_position(self):
 		px, py = self.pos

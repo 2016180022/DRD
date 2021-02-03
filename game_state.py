@@ -11,6 +11,9 @@ import mob_generator as mg
 canvas_width = 720
 canvas_height = 480
 
+index = 0
+WAVE = 20
+
 stage = 'demo'
 
 STATE_PLAYING, STATE_PAUSED = range(2)
@@ -78,7 +81,7 @@ def handle_event(e):
 		elif e.key == SDLK_v:
 			set_mob()
 		elif e.key == SDLK_b:
-			mob.decrease_life(10)
+			mob.decrease_life(10, 1)
 
 	# if gfw.world.objects_at(gfw.layer.sd):
 	# 	sd.handle_event(e)
@@ -96,8 +99,11 @@ def exit():
 	pass
 
 def attack_mob():
-	if sd.attack_target():
-		mob.decrease_life(50)
+	damage = 50
+	if sd.attack_target() is not None:
+		index = sd.attack_target()
+		mob.decrease_life(damage, index)
+		print("attack mob")
 
 def set_sd():
 	global sd
@@ -106,10 +112,13 @@ def set_sd():
 	print("set sd")
 
 def set_mob():
+	global index
 	global mob
-	mob = Mob()
-	gfw.world.add(gfw.layer.mob, mob)
-	print("set mob")
+	mob = Mob(index)
+	if index < WAVE:
+		gfw.world.add(gfw.layer.mob, mob)
+		index += 1
+		print(index, "th Mob Generated")
 
 if __name__ == '__main__':
 	gfw.run_main()
