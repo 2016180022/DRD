@@ -1,24 +1,20 @@
-#start at 210111
+#start at 210205
 from pico2d import *
 import gfw
 import gobj
-
-inven = 'demo'
+from button import Button
 
 canvas_width = 720
 canvas_height = 480
 
 def enter():
-	gfw.world.init(['bg', 'isd'])
+	gfw.world.init(['bg'])
 
-	bg = gobj.ImageObject('inven_item.png', canvas_width // 2, canvas_height // 2, canvas_width, canvas_height)
+	bg = gobj.ImageObject('inven_char_demo.png', canvas_width // 2, canvas_height // 2, canvas_width, canvas_height)
 	gfw.world.add(gfw.layer.bg, bg)
 
-def update():
-	gfw.world.update()
-
-def draw():
-	gfw.world.draw()
+def exit():
+	pass
 
 def handle_event(e):
 	if e.type == SDL_QUIT:
@@ -27,5 +23,8 @@ def handle_event(e):
 		if e.key == SDLK_ESCAPE:
 			return gfw.pop()
 
-def exit():
-	pass
+def update():
+	gfw.world.update()
+
+def draw():
+	gfw.world.draw()
