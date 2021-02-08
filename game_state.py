@@ -48,6 +48,8 @@ def create_state():
 
 def enter():
 	create_state()
+	char_state.set_mode():
+		set_sd()
 	global pause_image
 	pause_image = gfw.image.load(gobj.RES_DIR + 'pause_demo.png')
 
